@@ -1,0 +1,269 @@
+{
+  "name": "AI Voice Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "webhook_path_id",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [100, -100],
+      "id": "webhook_node_id",
+      "name": "Webhook",
+      "webhookId": "webhook_path_id"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=question:  {{ $json.body.question }}",
+        "options": {
+          "systemMessage": "\u003Crole\u003E\n- You are part of an AI Voice agent; you are the part that accesses the vector databases where we have the restaurant data\n\u003C/roles\u003E\n\n\u003Cfeatures\u003E\n- You will return the information the as completed possible\n- Avoid summarizing information \n\u003C/features\u003E\n\n\u003Cresousers\u003E\n- You have access to \"restaurante_vector_db\" tool to get all info about the restaurant\n\n- All menus is in menu_restaurante tool\n\u003C/resousers\u003E"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [480, -100],
+      "id": "ai_agent_node_id",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [580, 420],
+      "id": "embeddings_node_id",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "openai_api_credential_id",
+          "name": "openai_api_credential_name"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "restaurant_vector_store_name",
+        "description": "Return documents related to the restaurant and its menu, offer, and night stock...",
+        "topK": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
+      "typeVersion": 1,
+      "position": [660, 120],
+      "id": "restaurant_vector_store_node_id",
+      "name": "restaurante_vector_db"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "google_sheet_doc_id",
+          "mode": "list",
+          "cachedResultName": "fake_menu_en",
+          "cachedResultUrl": "google_sheet_doc_url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 840161567,
+          "mode": "list",
+          "cachedResultName": "fake_menu_en",
+          "cachedResultUrl": "google_sheet_sheet_url"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.5,
+      "position": [520, 120],
+      "id": "google_sheets_node_id",
+      "name": "menu_restaurante",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "google_sheets_credential_id",
+          "name": "google_sheets_credential_name"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "pinecone_index_name",
+          "mode": "list",
+          "cachedResultName": "pinecone_index_name"
+        },
+        "options": {
+          "pineconeNamespace": "pinecone_namespace"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1,
+      "position": [580, 280],
+      "id": "pinecone_vector_store_node_id",
+      "name": "vector_store",
+      "credentials": {
+        "pineconeApi": {
+          "id": "pinecone_api_credential_id",
+          "name": "pinecone_api_credential_name"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt_model_id"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [880, 280],
+      "id": "chat_model_node_id",
+      "name": "chat_restaurant_model",
+      "credentials": {
+        "openAiApi": {
+          "id": "openai_api_credential_id",
+          "name": "openai_api_credential_name"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt_model_id"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [360, 120],
+      "id": "openai_chat_model1_node_id",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "openai_api_credential_id",
+          "name": "openai_api_credential_name"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1080, -100],
+      "id": "respond_to_webhook_node_id",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "vector_store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "restaurante_vector_db": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "menu_restaurante": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "vector_store": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "restaurante_vector_db",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "chat_restaurant_model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "restaurante_vector_db",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "workflow_version_id",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "workflow_instance_id"
+  },
+  "id": "workflow_id",
+  "tags": []
+}
