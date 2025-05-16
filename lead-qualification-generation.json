@@ -1,0 +1,653 @@
+{
+  "name": "lead_custom_generation",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "webhook-id-placeholder",
+        "authentication": "basicAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [-40, -20],
+      "id": "node-id-placeholder-1",
+      "name": "Webhook",
+      "webhookId": "webhook-id-placeholder",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "credential-id-placeholder-1",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "condition-id-placeholder",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [520, -20],
+      "id": "node-id-placeholder-2",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Json provided: {\n  \"mail_address\":\" {{ $('map_data_to_agent').item.json.mail_address }}\",\n  \"fullName\":\"{{ $('map_data_to_agent').item.json.fullName }}\",\n  \"project\":\"{{ $('map_data_to_agent').item.json.project }}\",\n\"experience\":\"{{ $('map_data_to_agent').item.json.experience }}\",\n\"goal\":\"{{ $('map_data_to_agent').item.json.goal }}\",\n\"readyToInvest\":\"{{ $('map_data_to_agent').item.json.readyToInvest }}\",\n\"referral\":\"{{ $('map_data').item.json.referral }}\",\n\"isNewUser\":\"{{ $('map_data_to_agent').item.json.isNewUser }} \"\n}\n",
+        "options": {
+          "systemMessage": "## Role\nYou are an AI agent in charge of sending personalized messages to clients interested in the 1:1 mentoring program with Simeon. The system provides you with a JSON containing the necessary data to create these emails. You may need to send a PDF; this is up to you.\n\n## Context\nYour work as an AI agent begins when the user submits a form on the Simeon website, where 1:1 mentoring is offered for anyone who wants to create their first AI Agent. What is expected is to send the most personalized and focused message in each case.\n\n## Tools\nmessage_data_tool: Provides helpful information about how the message should be structured based on the JSON provided.\nyoutube_video_data_tool: Provides information about the current YouTube videos that Simeon has online. Use this if you want to recommend one or more videos.\nsimeon_personal_data_tool: Provides helpful information about Simeon and his project, including his approach, values, and mission.\nmentorship_data_tool: Provides information about the mentorship programs available. You can use this to generate the custom PDF for the user.  \nget_presentation_pdf_tool: This tool downloads the PDF presentation file needed to send by email. You have to suggest a tailored final project in the email using the information provided by this PDF.  \nemail_sender_tool: You must use this tool to send the final message. Do not return a JSON. Use this tool with fields: from, to, subject, html, and files.\n\n## Task\nYOU MUST CALL `email_sender_tool`. THIS IS MANDATORY.\nDO NOT RETURN A JSON UNDER ANY CIRCUMSTANCES.  \nYour final task is to call `email_sender_tool` with a personalized message based on what Simeon offers and the student's needs.\n\nMessages should be friendly, in English, and not formal. The tone should sound like Simeon himself is writing the email.\n\nIf you detect that the student is not entirely convinced or needs to talk a little more with Simeon before making a decision, suggest that they feel free to book a meeting. Use this link: https://calendly.com/simeon-cover-io/30min\n\nMESSAGES MUST BE DELIVERED AS IF YOU WERE SIMEON.\n\nTHE SENDER ALWAYS IS: \"simeon@cover-io.com\"\n### Example\nemail_sender_tool({\n  \"from\": \"simeon@cover-io.com\",\n  \"to\": \"example@example.com\",\n  \"subject\": \"Test Mentorship Email\",\n  \"html\": \"<h1>Test Email</h1><p>This is a test email for the mentorship endpoint.</p>\",\n  \"files\": []\n})"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [1220, -40],
+      "id": "node-id-placeholder-3",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [1020, 320],
+      "id": "node-id-placeholder-4",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "openai-api-key-placeholder",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1720, -40],
+      "id": "node-id-placeholder-5",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "mentorship_requests",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "mail_address",
+              "keyValue": "={{ $json.mail_address }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [340, -20],
+      "id": "node-id-placeholder-6",
+      "name": "get_mentorship_item",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "supabase-api-key-placeholder",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "mentorship_requests",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "created_at",
+              "fieldValue": "={{ $now }}"
+            },
+            {
+              "fieldId": "mail_address",
+              "fieldValue": "={{ $('map_data').item.json.mail_address }}"
+            },
+            {
+              "fieldId": "full_name",
+              "fieldValue": "={{ $('map_data').item.json.fullName }}"
+            },
+            {
+              "fieldId": "project",
+              "fieldValue": "={{ $('map_data').item.json.project }}"
+            },
+            {
+              "fieldId": "experience",
+              "fieldValue": "={{ $('map_data').item.json.experience }}"
+            },
+            {
+              "fieldId": "goal",
+              "fieldValue": "={{ $('map_data').item.json.goal }}"
+            },
+            {
+              "fieldId": "ready_to_invest",
+              "fieldValue": "={{ $('map_data').item.json.readyToInvest }}"
+            },
+            {
+              "fieldId": "referral",
+              "fieldValue": "={{ $('map_data').item.json.referral }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "pending"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [720, 60],
+      "id": "node-id-placeholder-7",
+      "name": "create_mentorship_item",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "supabase-api-key-placeholder",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"mail_address\":\"{{ $json.body.mail_address }}\",\n  \"fullName\":\"{{ $json.body.fullName }}\",\n  \"project\":\"{{ $json.body.project }}\",\n\"experience\":\"{{ $json.body.experience }}\",\n\"goal\":\"{{ $json.body.goal }}\",\n\"readyToInvest\":\"{{ $json.body.readyToInvest }}\",\n\"referral\":\"{{ $json.body.referral }}\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [140, -20],
+      "id": "node-id-placeholder-8",
+      "name": "map_data"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"mail_address\":\" {{ $('map_data').item.json.mail_address }}\",\n  \"fullName\":\"{{ $('map_data').item.json.fullName }}\",\n  \"project\":\"{{ $('map_data').item.json.project }}\",\n\"experience\":\"{{ $('map_data').item.json.experience }}\",\n\"goal\":\"{{ $('map_data').item.json.goal }}\",\n\"readyToInvest\":\"{{ $('map_data').item.json.readyToInvest }}\",\n\"referral\":\"{{ $('map_data').item.json.referral }}\",\n\"isNewUser\":\"{{ $('get_mentorship_item').item.json.isEmpty() }} \"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [920, -40],
+      "id": "node-id-placeholder-9",
+      "name": "map_data_to_agent"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "google-docs-id-placeholder-1"
+      },
+      "type": "n8n-nodes-base.googleDocsTool",
+      "typeVersion": 2,
+      "position": [1320, 380],
+      "id": "node-id-placeholder-10",
+      "name": "message_data_tool",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "google-docs-api-key-placeholder",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "google-sheets-id-placeholder",
+          "mode": "list",
+          "cachedResultName": "youtube_video_data_tool",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/placeholder-url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Hoja 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/placeholder-url"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.5,
+      "position": [1840, 380],
+      "id": "node-id-placeholder-11",
+      "name": "youtube_video_data_tool",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "google-sheets-api-key-placeholder",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "google-docs-id-placeholder-2"
+      },
+      "type": "n8n-nodes-base.googleDocsTool",
+      "typeVersion": 2,
+      "position": [1500, 380],
+      "id": "node-id-placeholder-12",
+      "name": "simeon_personal_data_tool",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "google-docs-api-key-placeholder",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "placeholder-url"
+      },
+      "type": "n8n-nodes-base.googleDocsTool",
+      "typeVersion": 2,
+      "position": [1680, 380],
+      "id": "node-id-placeholder-13",
+      "name": "mentorship_data_tool",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "google-docs-api-key-placeholder",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Gather and Map data\n",
+        "height": 300,
+        "width": 960
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [100, -80],
+      "id": "note-id-placeholder-1",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## External data sources\n",
+        "height": 220,
+        "width": 700,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [1260, 320],
+      "id": "note-id-placeholder-2",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Get PDF presentation\n\n",
+        "height": 240,
+        "width": 200,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [1000, 480],
+      "id": "note-id-placeholder-3",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "google-drive-file-id-placeholder",
+          "mode": "list",
+          "cachedResultName": "mentorship_1_to_1_presentation_templete.pdf",
+          "cachedResultUrl": "https://drive.google.com/file/placeholder-url"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTool",
+      "typeVersion": 3,
+      "position": [1060, 560],
+      "id": "node-id-placeholder-14",
+      "name": "get_presentation_pdf_tool",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "google-drive-api-key-placeholder",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "email_sender_tool",
+        "description": "Use this tool to send the final personalized email to the user.  \nYou must include the subject, the message in HTML, and the user's email (to).  \nAlways use \"simeon@cover-io.com\" as the sender.  \nThis is the last step of your task — DO NOT return anything, just send the email.  \nThe field \"files\" must always be included as an empty array [] (even if there are no attachments).\n",
+        "workflowId": {
+          "__rl": true,
+          "value": "workflow-id-placeholder",
+          "mode": "list",
+          "cachedResultName": "email_sender_tool"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "files": "[]",
+            "html": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('html', ``, 'string') }}",
+            "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('subject', ``, 'string') }}",
+            "to": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('to', ``, 'string') }}",
+            "from": "={{ $fromAI('from', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "from",
+              "displayName": "from",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "to",
+              "displayName": "to",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "subject",
+              "displayName": "subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "html",
+              "displayName": "html",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "files",
+              "displayName": "files",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "array"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.1,
+      "position": [2060, 380],
+      "id": "node-id-placeholder-15",
+      "name": "email_sender_tool"
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "example.app.n8n.cloud",
+            "user-agent": "PostmanRuntime/7.43.0",
+            "content-length": "303",
+            "accept": "*/*",
+            "accept-encoding": "gzip, br",
+            "authorization": "Basic sanitized-auth-token",
+            "cache-control": "no-cache",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "0.0.0.0",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "XX",
+            "cf-ray": "sanitized-cf-ray",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "content-type": "application/json",
+            "postman-token": "sanitized-postman-token",
+            "x-forwarded-for": "0.0.0.0, 0.0.0.0",
+            "x-forwarded-host": "example.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "sanitized-server-info",
+            "x-is-trusted": "yes",
+            "x-real-ip": "0.0.0.0"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "mail_address": "example@example.com",
+            "fullName": "Example Name",
+            "project": "Create a AI Agent to provide customer support to my business",
+            "experience": "I don't have any experience",
+            "goal": "Use the AI agent on my business",
+            "readyToInvest": "No",
+            "referral": "Youtube"
+          },
+          "webhookUrl": "https://example.app.n8n.cloud/webhook-test/webhook-id-placeholder",
+          "executionMode": "test"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "map_data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "map_data_to_agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "create_mentorship_item",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Webhook": {
+      "main": [[]]
+    },
+    "get_mentorship_item": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "create_mentorship_item": {
+      "main": [
+        [
+          {
+            "node": "map_data_to_agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "map_data": {
+      "main": [
+        [
+          {
+            "node": "get_mentorship_item",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "map_data_to_agent": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "message_data_tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "youtube_video_data_tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "simeon_personal_data_tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "mentorship_data_tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get_presentation_pdf_tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "email_sender_tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "version-id-placeholder",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "instance-id-placeholder"
+  },
+  "id": "workflow-json-id-placeholder",
+  "tags": []
+}

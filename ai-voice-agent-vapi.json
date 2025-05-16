@@ -1,0 +1,140 @@
+{
+  "name": "Vapi AI voice agent",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "webhook-path-placeholder",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0],
+      "id": "webhook-id-placeholder",
+      "name": "Webhook",
+      "webhookId": "webhook-id-placeholder"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.message.toolCalls[0].function.arguments.ai_agent_requirement }}",
+        "options": {
+          "systemMessage": "### role\nYou are the AI Voice Agent embedded in the Pulse.fm landing page. You help users understand the product by answering questions clearly and conversationally.\n\n### tool\napp_info_doc\nThis tool gives you access to a single Google Doc that contains official information about Pulse.fm, including features, pricing, comparisons, FAQs, and agent instructions. You must only use this source to answer.\n\n### task\nRead the question from the user and answer using only verified content from app_info_doc. Be brief, friendly, and helpful—like a smart product assistant during a live demo.\nIf the answer isn't available in the document, say:\n\"I'm not sure about that yet, but I'll pass it along to the team!\""
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [220, 0],
+      "id": "agent-id-placeholder",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [180, 200],
+      "id": "openai-model-id-placeholder",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "openai-credential-id-placeholder",
+          "name": "OpenAI Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "google-doc-url-placeholder"
+      },
+      "type": "n8n-nodes-base.googleDocsTool",
+      "typeVersion": 2,
+      "position": [400, 200],
+      "id": "google-doc-id-placeholder",
+      "name": "app_info_doc",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "google-credential-id-placeholder",
+          "name": "Google Docs Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [580, 0],
+      "id": "respond-webhook-id-placeholder",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "app_info_doc": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "version-id-placeholder",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "instance-id-placeholder"
+  },
+  "id": "workflow-id-placeholder",
+  "tags": []
+}

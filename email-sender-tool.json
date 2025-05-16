@@ -1,0 +1,252 @@
+{
+  "name": "email_sender_tool",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "jsonExample",
+        "jsonExample": "{\n\"from\": \"example@example.com\",\n  \"to\": \"recipient@example.com\",\n  \"subject\": \"Test Mentorship Email\",\n  \"html\": \"<h1>Test Email</h1><p>This is a test email for the mentorship endpoint.</p>\",\n  \"files\": []\n}"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [-120, -40],
+      "id": "node-id-placeholder-1",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "google-drive-file-id-placeholder",
+          "mode": "list",
+          "cachedResultName": "mentorship_1_to_1_presentation_templete.pdf",
+          "cachedResultUrl": "https://drive.google.com/file/placeholder-url"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [340, -80],
+      "id": "node-id-placeholder-2",
+      "name": "Google Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "google-drive-api-key-placeholder",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://example-api-endpoint.com/api/mentorship_mail",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n    \"Content-Type\": \"application/json\",\n    \"Accept\": \"application/json\"\n}",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "=from",
+              "value": "={{ $('When Executed by Another Workflow').item.json.from }}"
+            },
+            {
+              "name": "to",
+              "value": "={{ $('When Executed by Another Workflow').item.json.to }}"
+            },
+            {
+              "name": "=subject",
+              "value": "={{ $('When Executed by Another Workflow').item.json.subject }}"
+            },
+            {
+              "name": "html",
+              "value": "={{ $('When Executed by Another Workflow').item.json.html }}"
+            },
+            {
+              "name": "files",
+              "value": "={{ [$json] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [940, -80],
+      "id": "node-id-placeholder-3",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "condition-id-placeholder-1",
+              "leftValue": "={{ $json.from }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "condition-id-placeholder-2",
+              "leftValue": "={{ $json.to }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "condition-id-placeholder-3",
+              "leftValue": "={{ $json.subject }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "condition-id-placeholder-4",
+              "leftValue": "={{ $json.html }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [100, -40],
+      "id": "node-id-placeholder-4",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "errorMessage": "A required property is needed"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [340, 100],
+      "id": "node-id-placeholder-5",
+      "name": "Stop and Error"
+    },
+    {
+      "parameters": {
+        "setAllData": false,
+        "options": {
+          "keepAsBase64": true
+        }
+      },
+      "id": "node-id-placeholder-6",
+      "name": "Convert to/from binary data",
+      "type": "n8n-nodes-base.moveBinaryData",
+      "typeVersion": 1.1,
+      "position": [540, -80]
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"filename\": \"mentorship_1_to_1_presentation_templete.pdf\",\n  \"contentType\": \"application/pdf\",\n\"content\": \"{{ $json.data }}\"\n}\n ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [740, -80],
+      "id": "node-id-placeholder-7",
+      "name": "Edit Fields"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive": {
+      "main": [
+        [
+          {
+            "node": "Convert to/from binary data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to/from binary data": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "version-id-placeholder",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "instance-id-placeholder"
+  },
+  "id": "workflow-id-placeholder",
+  "tags": []
+}
