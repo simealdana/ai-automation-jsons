@@ -1,0 +1,1352 @@
+{
+  "name": "MCP_reddit",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "REDACTED"
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
+      "typeVersion": 1,
+      "position": [-220, -240],
+      "id": "b541db58-116d-406f-a83d-3fa66b120263",
+      "name": "MCP Server Trigger",
+      "webhookId": "REDACTED"
+    },
+    {
+      "parameters": {
+        "inputSource": "jsonExample",
+        "jsonExample": "{\n  \"operation\": \"string\",\n  \"limit\": 100,\n  \"subReddit\": \"string\",\n  \"postPostId\": \"string\",\n  \"postTitle\": \"string\",\n  \"postText\": \"string\",\n  \"filterCategory\": \"hot\",\n  \"filtersKeyword\": \"string\",\n  \"filtersTrendig\": \"string\",\n  \"commentPostId\": \"string\",\n  \"commentText\": \"string\",\n  \"commentCommentId\": \"stirng\",\n  \"commentReplyText\": \"string\"\n}"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [540, 240],
+      "id": "40451b0c-2111-420b-bb22-59b14d497cd3",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "subreddit": "={{$json.subReddit}}",
+        "title": "={{$json.postTitle}}",
+        "text": "={{$json.postText}}"
+      },
+      "type": "n8n-nodes-base.reddit",
+      "typeVersion": 1,
+      "position": [1300, -680],
+      "id": "3ae445e0-3cb9-4d21-9484-a54b340ba899",
+      "name": "create_post",
+      "credentials": {
+        "redditOAuth2Api": {
+          "id": "REDACTED",
+          "name": "Reddit account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "subreddit": "={{$json.subReddit}}",
+        "limit": "={{$json.limit}}",
+        "filters": {
+          "category": "={{$json.filtersCategory}}"
+        }
+      },
+      "type": "n8n-nodes-base.reddit",
+      "typeVersion": 1,
+      "position": [1300, -520],
+      "id": "14d04035-c71e-4108-84f5-fb2859f86ef6",
+      "name": "get_many_posts",
+      "credentials": {
+        "redditOAuth2Api": {
+          "id": "REDACTED",
+          "name": "Reddit account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "postId": "={{$json.postPostId}}"
+      },
+      "type": "n8n-nodes-base.reddit",
+      "typeVersion": 1,
+      "position": [1300, -340],
+      "id": "def4b85a-5c94-40ca-883f-8c8087e7adf3",
+      "name": "delete_post",
+      "credentials": {
+        "redditOAuth2Api": {
+          "id": "REDACTED",
+          "name": "Reddit account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "subreddit": "={{$json.subReddit}}",
+        "postId": "={{$json.postPostId}}"
+      },
+      "type": "n8n-nodes-base.reddit",
+      "typeVersion": 1,
+      "position": [1300, -160],
+      "id": "422e5d8e-fe9e-4b33-9608-1921da4e1a0a",
+      "name": "get_post_by_id",
+      "credentials": {
+        "redditOAuth2Api": {
+          "id": "REDACTED",
+          "name": "Reddit account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.operation}}",
+                    "rightValue": "post_",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    },
+                    "id": "cd565fc9-b8c6-4cfa-97f4-0afaf7dfbb8e"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "post_flow"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "6cc1bd32-41cf-4f63-b69b-3a6416de4544",
+                    "leftValue": "={{ $json.operation}}",
+                    "rightValue": "comment_",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "comment_flow"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "a755d168-4467-42a5-96ed-6648be0722e5",
+                    "leftValue": "={{ $json.operation}}",
+                    "rightValue": "=subreddit_",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "subreddit_flow"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [760, 240],
+      "id": "c14f7575-d78d-4971-b76a-a06d0a57b1b9",
+      "name": "operation_switch"
+    },
+    {
+      "parameters": {
+        "resource": "postComment",
+        "postId": "={{$json.commentPostId}}",
+        "commentText": "={{$json.commentText}}"
+      },
+      "type": "n8n-nodes-base.reddit",
+      "typeVersion": 1,
+      "position": [1300, 80],
+      "id": "c55aafce-5bf8-465b-8c01-a45dffeb7d07",
+      "name": "create_comment",
+      "credentials": {
+        "redditOAuth2Api": {
+          "id": "REDACTED",
+          "name": "Reddit account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "postComment",
+        "operation": "getAll",
+        "subreddit": "={{$json.subReddit}}",
+        "postId": "={{$json.commentPostId}}",
+        "limit": "={{$json.limit}}"
+      },
+      "type": "n8n-nodes-base.reddit",
+      "typeVersion": 1,
+      "position": [1300, 260],
+      "id": "8de60854-fd35-48aa-bb30-a25a5447d2f4",
+      "name": "get_many_comments",
+      "credentials": {
+        "redditOAuth2Api": {
+          "id": "REDACTED",
+          "name": "Reddit account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "postComment",
+        "operation": "delete",
+        "commentId": "={{$json.commentCommentId}}"
+      },
+      "type": "n8n-nodes-base.reddit",
+      "typeVersion": 1,
+      "position": [1300, 460],
+      "id": "476bb18c-c71c-4d77-b94e-7d87f6a6afac",
+      "name": "delete_comment",
+      "credentials": {
+        "redditOAuth2Api": {
+          "id": "REDACTED",
+          "name": "Reddit account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "postComment",
+        "operation": "reply",
+        "commentId": "={{$json.commentCommentId}}",
+        "replyText": "={{$json.commentReplyText}}"
+      },
+      "type": "n8n-nodes-base.reddit",
+      "typeVersion": 1,
+      "position": [1300, 660],
+      "id": "3ec0391c-d179-4cfa-b25a-455661952c39",
+      "name": "reply_comment",
+      "credentials": {
+        "redditOAuth2Api": {
+          "id": "REDACTED",
+          "name": "Reddit account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{$json.operation}}",
+                    "rightValue": "post_create",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "f466ea36-35a0-4c41-9d7f-9ca9a3199ec2"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "post_create"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b37861f0-cd89-4fd2-9653-cbc0e4585a44",
+                    "leftValue": "={{$json.operation}}",
+                    "rightValue": "post_get_many",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "post_get_many"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "72731a2a-a77b-4b1a-8202-bcb6de1e0c7e",
+                    "leftValue": "={{$json.operation}}",
+                    "rightValue": "post_delete",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "post_delete"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "39db435c-6cb9-4677-94d5-0a312452319e",
+                    "leftValue": "={{$json.operation}}",
+                    "rightValue": "post_get_by_id",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "post_get_by_id"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "1478f02b-c057-485f-b83f-7c3d9d8274ea",
+                    "leftValue": "={{$json.operation}}",
+                    "rightValue": "post_search",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "post_search"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [1020, -340],
+      "id": "6ce98a36-d6da-4229-951d-fcba8f5a2b6c",
+      "name": "post_switch"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{$json.operation}}",
+                    "rightValue": "comment_create",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "f466ea36-35a0-4c41-9d7f-9ca9a3199ec2"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "comment_create"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b37861f0-cd89-4fd2-9653-cbc0e4585a44",
+                    "leftValue": "={{$json.operation}}",
+                    "rightValue": "comment_get_many",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "comment_get_many"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "72731a2a-a77b-4b1a-8202-bcb6de1e0c7e",
+                    "leftValue": "={{$json.operation}}",
+                    "rightValue": "comment_delete",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "comment_delete"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "39db435c-6cb9-4677-94d5-0a312452319e",
+                    "leftValue": "={{$json.operation}}",
+                    "rightValue": "comment_reply",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "comment_reply"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [1000, 220],
+      "id": "66693e75-0b94-460f-9c86-5d925ec52be2",
+      "name": "comment_switch"
+    },
+    {
+      "parameters": {
+        "resource": "subreddit",
+        "subreddit": "={{$json.subReddit}}"
+      },
+      "type": "n8n-nodes-base.reddit",
+      "typeVersion": 1,
+      "position": [1300, 860],
+      "id": "2e1a6a72-59b5-422e-8bde-d1dd837ccfda",
+      "name": "get_subreddit_about"
+    },
+    {
+      "parameters": {
+        "resource": "subreddit",
+        "content": "rules",
+        "subreddit": "={{$json.subReddit}}"
+      },
+      "type": "n8n-nodes-base.reddit",
+      "typeVersion": 1,
+      "position": [1300, 1220],
+      "id": "da324c0c-7f75-4c57-b126-76d24528311e",
+      "name": "get_subreddit_rules"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{$json.operation}}",
+                    "rightValue": "=subreddit_get_about",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "9c50f7b3-d51e-4325-b904-b2dadf20067a"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "subreddit_get_about"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "339d8536-7dfe-4478-b7a8-2d55e0f13028",
+                    "leftValue": "={{$json.operation}}",
+                    "rightValue": "subreddit_get_many",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "subreddit_get_many"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "21e9d5e4-ccfb-4ba0-82f7-b0d49d86865b",
+                    "leftValue": "={{$json.operation}}",
+                    "rightValue": "subreddit_get_rules",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "subreddit_get_rules"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [1040, 980],
+      "id": "04044204-2fe9-4bc1-8eaa-4e2019371f21",
+      "name": "subreddit_switch"
+    },
+    {
+      "parameters": {
+        "resource": "subreddit",
+        "operation": "getAll",
+        "limit": "={{ $json.limit }}",
+        "filters": {
+          "keyword": "={{ $json.filtersKeyword }}",
+          "trending": "={{ $json.filtersTrendig.toBoolean() }}"
+        }
+      },
+      "type": "n8n-nodes-base.reddit",
+      "typeVersion": 1,
+      "position": [1300, 1020],
+      "id": "26b4d79a-9306-45cf-a8cd-b6ec652d7903",
+      "name": "subreddit_get_many"
+    },
+    {
+      "parameters": {
+        "name": "post_operation",
+        "description": "Call this tool to fire action on post-operation; the allowed operations are:\n- post_create\nparameters: subReddit, postPostId, postPostText\n- post_delete\nparameters: postPostId\n- post_get_many\nparameters: subReddit, limit, filterCategory\n- post_get_by_id\nparameters: postPostId, subReddit\n- post_search\nparameters: filtersKeyword, subReddit, limit",
+        "workflowId": {
+          "__rl": true,
+          "value": "REDACTED",
+          "mode": "list",
+          "cachedResultName": "MCP_reddit"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "limit": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('limit', ``, 'number') }}",
+            "operation": "={{ $fromAI('operation', 'Type of Reddit operation to post. Options: post_create, post_delete, post_get_many, post_search, post_get_by_id', 'string') }}",
+            "subReddit": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('subReddit', ``, 'string') }}",
+            "postPostId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('postPostId', ``, 'string') }}",
+            "postTitle": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('postTitle', ``, 'string') }}",
+            "postText": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('postText', ``, 'string') }}",
+            "filterCategory": "={{ $fromAI(\n  'filterCategory',\n  'Category used to filter Reddit posts. Must be one of: \"top\", \"hot\", \"new\", \"rising\". Example: filterCategory: \"hot\"',\n  'string'\n) }}",
+            "filtersKeyword": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('filtersKeyword', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "operation",
+              "displayName": "operation",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "limit",
+              "displayName": "limit",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number"
+            },
+            {
+              "id": "subReddit",
+              "displayName": "subReddit",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "postPostId",
+              "displayName": "postPostId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "postTitle",
+              "displayName": "postTitle",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "postText",
+              "displayName": "postText",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "filterCategory",
+              "displayName": "filterCategory",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "filtersKeyword",
+              "displayName": "filtersKeyword",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "filtersTrendig",
+              "displayName": "filtersTrendig",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            },
+            {
+              "id": "commentPostId",
+              "displayName": "commentPostId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            },
+            {
+              "id": "commentText",
+              "displayName": "commentText",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            },
+            {
+              "id": "commentCommentId",
+              "displayName": "commentCommentId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            },
+            {
+              "id": "commentReplyText",
+              "displayName": "commentReplyText",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.1,
+      "position": [-180, -20],
+      "id": "fa1a3b6f-b01b-48e0-93f8-772310dfd8a7",
+      "name": "post_operation"
+    },
+    {
+      "parameters": {
+        "name": "subReddit_operation",
+        "description": "Call this tool to fire action on subreddit operation; the allowed operations are:\n- subreddit_get_about : get info about subreddit\nparameters: subReddit\n- subreddit_get_many: get many subreddit by filters\nparameters: subReddit, limit, filtersKeyword (optional), filtersTrendig(optional)\n- subreddit_get_rules: get info about subreddit's rules\nparameters: subReddit\n\n",
+        "workflowId": {
+          "__rl": true,
+          "value": "REDACTED",
+          "mode": "list",
+          "cachedResultName": "MCP_reddit"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "operation": "={{ $fromAI('operation', 'Type of Reddit operation to subreddit. Options: subreddit_get_about, subreddit_get_many, subreddit_get_rules', 'string') }}",
+            "limit": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('limit', ``, 'number') }}",
+            "subReddit": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('subReddit', ``, 'string') }}",
+            "filtersKeyword": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('filtersKeyword', ``, 'string') }}",
+            "filtersTrendig": "={{ $fromAI('filtersTrendig', `This is a booleand true or false`, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "operation",
+              "displayName": "operation",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "limit",
+              "displayName": "limit",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number"
+            },
+            {
+              "id": "subReddit",
+              "displayName": "subReddit",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "postPostId",
+              "displayName": "postPostId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            },
+            {
+              "id": "postTitle",
+              "displayName": "postTitle",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            },
+            {
+              "id": "postText",
+              "displayName": "postText",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            },
+            {
+              "id": "filterCategory",
+              "displayName": "filterCategory",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            },
+            {
+              "id": "filtersKeyword",
+              "displayName": "filtersKeyword",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "filtersTrendig",
+              "displayName": "filtersTrendig",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "comment",
+              "displayName": "comment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "object",
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.1,
+      "position": [-20, -20],
+      "id": "f10780f6-e85a-41dc-849a-85ae4b2289fb",
+      "name": "subReddit_operation"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n    \"posts\": {{ $('search_posts').all().map(item => ({\n        subreddit: item.json.subreddit,\n        selftext: item.json.selftext,\n        author_fullname: item.json.author_fullname,\n        title: item.json.title,\n        total_awards_received: item.json.total_awards_received,\n        link_flair_text: item.json.link_flair_text,\n        score: item.json.score,\n        thumbnail: item.json.thumbnail,\n        created: item.json.created,\n        num_comments: item.json.num_comments,\n        permalink: item.json.permalink \n    })) }}\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1520, -520],
+      "id": "ea367253-a874-4fc2-a156-a22d8ae20386",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "name": "comment_operation",
+        "description": "Call this tool to handle comment operations:\n\n- comment_create\nparameters: commentPostId, commentText\n- comment_get_many \nparameters: subReddit, limit, commentPostId \n- comment_delete \nparameters: commentCommentId\n- comment_reply\nparameters: commentCommentId, commentReplyText",
+        "workflowId": {
+          "__rl": true,
+          "value": "REDACTED",
+          "mode": "list",
+          "cachedResultName": "MCP_reddit"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "subReddit": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('subReddit', ``, 'string') }}",
+            "limit": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('limit', ``, 'number') }}",
+            "commentPostId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('commentPostId', ``, 'string') }}",
+            "commentText": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('commentText', ``, 'string') }}",
+            "commentCommentId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('commentCommentId', ``, 'string') }}",
+            "commentReplyText": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('commentReplyText', ``, 'string') }}",
+            "operation": "={{ $fromAI('operation', 'Type of Reddit operation to comment. Options: comment_create, comment_get_many, comment_delete, comment_reply', 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "operation",
+              "displayName": "operation",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "limit",
+              "displayName": "limit",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number"
+            },
+            {
+              "id": "subReddit",
+              "displayName": "subReddit",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "postPostId",
+              "displayName": "postPostId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            },
+            {
+              "id": "postTitle",
+              "displayName": "postTitle",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            },
+            {
+              "id": "postText",
+              "displayName": "postText",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            },
+            {
+              "id": "filterCategory",
+              "displayName": "filterCategory",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            },
+            {
+              "id": "filtersKeyword",
+              "displayName": "filtersKeyword",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            },
+            {
+              "id": "filtersTrendig",
+              "displayName": "filtersTrendig",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            },
+            {
+              "id": "commentPostId",
+              "displayName": "commentPostId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "commentText",
+              "displayName": "commentText",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "commentCommentId",
+              "displayName": "commentCommentId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "commentReplyText",
+              "displayName": "commentReplyText",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.1,
+      "position": [160, -20],
+      "id": "3783630e-9398-4fa1-b486-e541c3df6a17",
+      "name": "comment_operation"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "subreddit": "={{$json.subReddit}}",
+        "keyword": "={{$json.filtersKeyword}}",
+        "limit": "={{$json.limit}}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.reddit",
+      "typeVersion": 1,
+      "position": [1580, -240],
+      "id": "0e9a89f1-e409-4e41-8c64-d898029c096b",
+      "name": "search_posts",
+      "credentials": {
+        "redditOAuth2Api": {
+          "id": "REDACTED",
+          "name": "Reddit account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n    \"posts\": {{ $('search_posts').all().map(item => ({\n        subreddit: item.json.subreddit,\n        selftext: item.json.selftext,\n        author_fullname: item.json.author_fullname,\n        title: item.json.title,\n        total_awards_received: item.json.total_awards_received,\n        link_flair_text: item.json.link_flair_text,\n        score: item.json.score,\n        thumbnail: item.json.thumbnail,\n        created: item.json.created,\n        num_comments: item.json.num_comments,\n        permalink: item.json.permalink \n    })) }}\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1800, -240],
+      "id": "14a4d27e-0f0d-4d57-8e6a-4652563e42b1",
+      "name": "Edit Fields1"
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "limit": 1,
+          "operation": "post_search",
+          "subReddit": "n8n",
+          "postPostId": "",
+          "postTitle": "",
+          "postText": "",
+          "filterCategory": "",
+          "filtersKeyword": "ai voice"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "operation_switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "operation_switch": {
+      "main": [
+        [
+          {
+            "node": "post_switch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "comment_switch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "subreddit_switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "post_switch": {
+      "main": [
+        [
+          {
+            "node": "create_post",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "get_many_posts",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "delete_post",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "get_post_by_id",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "search_posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "comment_switch": {
+      "main": [
+        [
+          {
+            "node": "create_comment",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "get_many_comments",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "delete_comment",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "reply_comment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "subreddit_switch": {
+      "main": [
+        [
+          {
+            "node": "get_subreddit_about",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "subreddit_get_many",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "get_subreddit_rules",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "post_operation": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "subReddit_operation": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get_many_posts": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "comment_operation": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "search_posts": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "REDACTED",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "REDACTED"
+  },
+  "id": "REDACTED",
+  "tags": []
+}
