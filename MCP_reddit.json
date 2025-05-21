@@ -7,8 +7,8 @@
       },
       "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
       "typeVersion": 1,
-      "position": [-220, -240],
-      "id": "b541db58-116d-406f-a83d-3fa66b120263",
+      "position": [-120, -240],
+      "id": "REDACTED",
       "name": "MCP Server Trigger",
       "webhookId": "REDACTED"
     },
@@ -36,7 +36,7 @@
       "name": "create_post",
       "credentials": {
         "redditOAuth2Api": {
-          "id": "REDACTED",
+          "id": "3f8CC1vY3oEBBHwm",
           "name": "Reddit account"
         }
       }
@@ -57,7 +57,7 @@
       "name": "get_many_posts",
       "credentials": {
         "redditOAuth2Api": {
-          "id": "REDACTED",
+          "id": "3f8CC1vY3oEBBHwm",
           "name": "Reddit account"
         }
       }
@@ -74,7 +74,7 @@
       "name": "delete_post",
       "credentials": {
         "redditOAuth2Api": {
-          "id": "REDACTED",
+          "id": "3f8CC1vY3oEBBHwm",
           "name": "Reddit account"
         }
       }
@@ -92,7 +92,7 @@
       "name": "get_post_by_id",
       "credentials": {
         "redditOAuth2Api": {
-          "id": "REDACTED",
+          "id": "3f8CC1vY3oEBBHwm",
           "name": "Reddit account"
         }
       }
@@ -196,7 +196,7 @@
       "name": "create_comment",
       "credentials": {
         "redditOAuth2Api": {
-          "id": "REDACTED",
+          "id": "3f8CC1vY3oEBBHwm",
           "name": "Reddit account"
         }
       }
@@ -216,7 +216,7 @@
       "name": "get_many_comments",
       "credentials": {
         "redditOAuth2Api": {
-          "id": "REDACTED",
+          "id": "3f8CC1vY3oEBBHwm",
           "name": "Reddit account"
         }
       }
@@ -234,7 +234,7 @@
       "name": "delete_comment",
       "credentials": {
         "redditOAuth2Api": {
-          "id": "REDACTED",
+          "id": "3f8CC1vY3oEBBHwm",
           "name": "Reddit account"
         }
       }
@@ -248,12 +248,12 @@
       },
       "type": "n8n-nodes-base.reddit",
       "typeVersion": 1,
-      "position": [1300, 660],
+      "position": [1300, 640],
       "id": "3ec0391c-d179-4cfa-b25a-455661952c39",
       "name": "reply_comment",
       "credentials": {
         "redditOAuth2Api": {
-          "id": "REDACTED",
+          "id": "3f8CC1vY3oEBBHwm",
           "name": "Reddit account"
         }
       }
@@ -516,7 +516,7 @@
       },
       "type": "n8n-nodes-base.reddit",
       "typeVersion": 1,
-      "position": [1300, 860],
+      "position": [1300, 920],
       "id": "2e1a6a72-59b5-422e-8bde-d1dd837ccfda",
       "name": "get_subreddit_about"
     },
@@ -528,7 +528,7 @@
       },
       "type": "n8n-nodes-base.reddit",
       "typeVersion": 1,
-      "position": [1300, 1220],
+      "position": [1300, 1280],
       "id": "da324c0c-7f75-4c57-b126-76d24528311e",
       "name": "get_subreddit_rules"
     },
@@ -616,7 +616,7 @@
       },
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.2,
-      "position": [1040, 980],
+      "position": [980, 1040],
       "id": "04044204-2fe9-4bc1-8eaa-4e2019371f21",
       "name": "subreddit_switch"
     },
@@ -632,7 +632,7 @@
       },
       "type": "n8n-nodes-base.reddit",
       "typeVersion": 1,
-      "position": [1300, 1020],
+      "position": [1300, 1100],
       "id": "26b4d79a-9306-45cf-a8cd-b6ec652d7903",
       "name": "subreddit_get_many"
     },
@@ -929,18 +929,6 @@
     },
     {
       "parameters": {
-        "mode": "raw",
-        "jsonOutput": "={\n    \"posts\": {{ $('search_posts').all().map(item => ({\n        subreddit: item.json.subreddit,\n        selftext: item.json.selftext,\n        author_fullname: item.json.author_fullname,\n        title: item.json.title,\n        total_awards_received: item.json.total_awards_received,\n        link_flair_text: item.json.link_flair_text,\n        score: item.json.score,\n        thumbnail: item.json.thumbnail,\n        created: item.json.created,\n        num_comments: item.json.num_comments,\n        permalink: item.json.permalink \n    })) }}\n}\n",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [1520, -520],
-      "id": "ea367253-a874-4fc2-a156-a22d8ae20386",
-      "name": "Edit Fields"
-    },
-    {
-      "parameters": {
         "name": "comment_operation",
         "description": "Call this tool to handle comment operations:\n\n- comment_create\nparameters: commentPostId, commentText\n- comment_get_many \nparameters: subReddit, limit, commentPostId \n- comment_delete \nparameters: commentCommentId\n- comment_reply\nparameters: commentCommentId, commentReplyText",
         "workflowId": {
@@ -1115,10 +1103,22 @@
       "name": "search_posts",
       "credentials": {
         "redditOAuth2Api": {
-          "id": "REDACTED",
+          "id": "3f8CC1vY3oEBBHwm",
           "name": "Reddit account"
         }
       }
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n    \"posts\": {{ $('get_many_posts').all().map(item => ({\n        subreddit: item.json.subreddit,\n        selftext: item.json.selftext,\n        author_fullname: item.json.author_fullname,\n        title: item.json.title,\n        total_awards_received: item.json.total_awards_received,\n        link_flair_text: item.json.link_flair_text,\n        score: item.json.score,\n        thumbnail: item.json.thumbnail,\n        created: item.json.created,\n        num_comments: item.json.num_comments,\n        permalink: item.json.permalink \n    })) }}\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1520, -520],
+      "id": "ea367253-a874-4fc2-a156-a22d8ae20386",
+      "name": "map_post_get_many"
     },
     {
       "parameters": {
@@ -1130,21 +1130,118 @@
       "typeVersion": 3.4,
       "position": [1800, -240],
       "id": "14a4d27e-0f0d-4d57-8e6a-4652563e42b1",
-      "name": "Edit Fields1"
+      "name": "map_post_get_search"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"comments\": {{ $('get_many_comments').all().map(item => ({\n    subreddit: item.json.subreddit,\n    author: item.json.author,\n    author_is_blocked: item.json.author_is_blocked,\n    body: item.json.body,\n    score: item.json.score,\n    total_awards_received: item.json.total_awards_received,\n    created: item.json.created,\n    permalink: item.json.permalink,\n    replies: item.json.replies\n  })) }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1520, 260],
+      "id": "62bf710d-2dcd-4a09-b1be-c2481d523d5b",
+      "name": "map_comment_get_many"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "comments",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [1740, 260],
+      "id": "7810503f-f56a-40ba-b6bb-5743d40caab8",
+      "name": "split_out_get_many_comments"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "={{$json.posts}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [1980, -400],
+      "id": "dbf5e1b9-fe70-42a8-9fb7-ab513389200a",
+      "name": "posts_split_out"
+    },
+    {
+      "parameters": {
+        "content": "## Input and switch to right operation type\nThe MCP server receives a JSON that describes the type of operation that you want to query or perform.\n",
+        "height": 540,
+        "width": 660
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-280, -380],
+      "id": "2fc0abce-cd11-4feb-9f46-123003bae2eb",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Possible operations:\n\n\n- post_create\n- post_delete\n- post_get_many\n- post_get_by_id\n- post_search\n- comment_create\n- comment_delete\n- comment_get_many\n- comment_reply\n- subreddit_get_about\n- subreddit_get_rules\n- subreddit_get_many",
+        "height": 380,
+        "width": 320,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [400, -380],
+      "id": "d84e71d4-8d27-48b2-9263-7f82cb4b12bd",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Post CRUD\n",
+        "height": 740,
+        "width": 1360,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [860, -740],
+      "id": "477eddba-407e-4e03-a16f-b4b8d45da6e9",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Comment CRUD\n",
+        "height": 760,
+        "width": 1080,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [960, 40],
+      "id": "18163585-0952-419f-9705-7f58af1e2861",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## Subreddit read's operation",
+        "height": 640,
+        "width": 600,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [960, 860],
+      "id": "37915576-4634-43a2-ad92-f88979491347",
+      "name": "Sticky Note4"
     }
   ],
   "pinData": {
     "When Executed by Another Workflow": [
       {
         "json": {
-          "limit": 1,
-          "operation": "post_search",
           "subReddit": "n8n",
-          "postPostId": "",
-          "postTitle": "",
-          "postText": "",
-          "filterCategory": "",
-          "filtersKeyword": "ai voice"
+          "limit": 10,
+          "commentPostId": "1kmin88",
+          "commentText": "",
+          "commentCommentId": "",
+          "commentReplyText": "",
+          "operation": "comment_get_many"
         }
       }
     ]
@@ -1308,7 +1405,7 @@
       "main": [
         [
           {
-            "node": "Edit Fields",
+            "node": "map_post_get_many",
             "type": "main",
             "index": 0
           }
@@ -1330,7 +1427,51 @@
       "main": [
         [
           {
-            "node": "Edit Fields1",
+            "node": "map_post_get_search",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get_many_comments": {
+      "main": [
+        [
+          {
+            "node": "map_comment_get_many",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "map_comment_get_many": {
+      "main": [
+        [
+          {
+            "node": "split_out_get_many_comments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "map_post_get_search": {
+      "main": [
+        [
+          {
+            "node": "posts_split_out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "map_post_get_many": {
+      "main": [
+        [
+          {
+            "node": "posts_split_out",
             "type": "main",
             "index": 0
           }
